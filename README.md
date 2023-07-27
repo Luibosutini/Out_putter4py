@@ -6,6 +6,7 @@
 *  定公開にするならば非公開にチェックをいれてください
 *  Qiitaトークンには次の項目にチェックを入れたトークンをいれてください  
 ![QiitaTokenImage](https://github.com/Luibosutini/Out_putter4py/assets/68042170/b4e70a94-3a79-4f04-a240-e44bcef1a20d)
-* 後にしたの枠に出てくるメモを選択してQiitaに投稿を押してください  
+* 後にしたの枠に出てくるメモを選択してQiitaに投稿を押してください
+* 投稿後はQiita の方で調整を行ってください
 
 
