@@ -1,6 +1,7 @@
 import sys
 import requests
 import json
+import re
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QListWidget, QMessageBox
 
 
@@ -92,18 +93,17 @@ class MemoApp(QWidget):
                 print("レスポンス内容:", response.json())
 
     def extract_title_memo_tag_and_visibility(self, text_with_tag_visibility):
-        parts = text_with_tag_visibility.split(": ")
-        title = parts[0]
-        text_with_tag_visibility = parts[1]
-        tag_and_visibility = text_with_tag_visibility.split(" [Tag: ")
-        memo_text = tag_and_visibility[0].strip()
-        if len(tag_and_visibility) > 1:
-            tag_visibility = tag_and_visibility[1].split("] - ")
-            tag_text = tag_visibility[0].strip()
-            visibility = tag_visibility[1].strip()
-        else:
-            tag_text = ""
-            visibility = ""
+        visibility = text_with_tag_visibility.endswith("private")
+        text_with_tag_visibility = text_with_tag_visibility[0 : text_with_tag_visibility.rfind(" - ")]
+        
+        tag = re.search("\[Tag: .+]", text_with_tag_visibility)
+        tag_text = text_with_tag_visibility[tag.start() + 6 : tag.end() - 1]
+        text_with_tag_visibility = text_with_tag_visibility[0 : text_with_tag_visibility.rfind("[Tag: ")]
+        
+        title_and_text = text_with_tag_visibility.split(": ")
+        title = title_and_text[0]
+        memo_text = title_and_text[1]
+        
         return title, memo_text, tag_text, visibility
 
 
@@ -116,15 +116,15 @@ class MemoApp(QWidget):
         }
 
         data = {
-            "title": title,
             "body": text,
-            "tags": [{"name": tag}] if tag else [],
-            "private": True if visibility == "private" else False,
-            "rendered_body": text,  # 本文をマークダウン方式で出力
+            "tags": [{"name": tag}],
+            "title": title,
+            "private": visibility
         }
 
         try:
             response = requests.post(qiita_api_url, headers=headers, data=json.dumps(data))
+            print(json.dumps(data))
             return response
         except requests.exceptions.RequestException as e:
             print(e)
